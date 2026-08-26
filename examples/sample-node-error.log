@@ -1,0 +1,4 @@
+# SYNTHETIC EXAMPLE
+TOKEN=synthetic-example-token
+TypeError: Cannot read properties of undefined
+    at main (C:\Users\Example\project\index.js:12:4)
