@@ -1,0 +1,9 @@
+# SYNTHETIC EXAMPLE — not a real credential
+2026-08-26 10:42:11 ERROR Failed to connect
+DATABASE_URL=postgres://demo:example-password@10.0.0.8/app
+User: developer@example.test
+Path: /home/example-user/projects/app
+Traceback (most recent call last):
+  File "/home/example-user/projects/app/main.py", line 12, in connect
+    raise ConnectionRefusedError("connection refused")
+ConnectionRefusedError: connection refused
