@@ -43,7 +43,7 @@ Detection is pattern-based. **Always review generated material before sharing.**
 | `doctor` | Read-only system, developer tool, and narrow Docker diagnostics |
 | `scan FILE` | Write a new sanitized text copy; supports `--output` and `--dry-run` |
 | `inspect FILE` | Display counts without creating a file or revealing matches |
-| `bundle [--file FILE]` | Generate Markdown, JSON, and sanitized copies |
+| `bundle [--file FILE]` | Transactionally generate Markdown, optional JSON, and sanitized copies |
 | `config` | Show config location and active privacy defaults |
 | `version` | Show the package version |
 
@@ -69,7 +69,17 @@ redact_username = true
 
 [scan]
 max_file_size_mb = 20
+
+[report]
+include_diagnostics_json = true
 ```
+
+Bundles are assembled in a private temporary directory and only moved into place
+after every output is ready. Existing destinations are never replaced, duplicate
+input filenames are numbered instead of overwritten, and generated files use
+owner-only permissions on platforms that support them. Set
+`include_diagnostics_json = false` to produce only the human-readable report and
+sanitized copies.
 
 ## Examples
 
