@@ -29,8 +29,16 @@ def _load(path: Path) -> tuple[str, Config]:
     except (FileSafetyError, OSError) as exc:
         console.print("[bold red]Unable to read file.[/bold red]\n\nReason:\n" + str(exc)); raise typer.Exit(3) from None
 
-def _analyze(path: Path) -> ScanResult:
-    text, cfg = _load(path)
+def _analyze(path: Path, config: Config | None = None) -> ScanResult:
+    if config is None:
+        text, cfg = _load(path)
+    else:
+        cfg = config
+        try:
+            text = read_text_file(path, cfg.scan.max_file_size_mb * 1024 * 1024)
+        except (FileSafetyError, OSError) as exc:
+            console.print(f"[bold red]Unable to read file.[/bold red]\n\nReason:\n{exc}")
+            raise typer.Exit(3) from None
     return sanitize_text(text, path.name, cfg)
 
 @app.command()
@@ -86,7 +94,13 @@ def scan(file: Annotated[Path, typer.Argument(exists=False)], output: Annotated[
 @app.command()
 def bundle(output: Annotated[Path, typer.Option("--output", "-o")] = Path("reprosafe-report"), files: Annotated[list[Path] | None, typer.Option("--file", help="Text file to sanitize and include (repeatable).")] = None) -> None:
     """Create Markdown, JSON, and sanitized-file diagnostics locally."""
-    scans = [_analyze(path) for path in (files or [])]
-    try: created = create_bundle(output, scans)
+    cfg = load_config()
+    scans = [_analyze(path, cfg) for path in (files or [])]
+    try:
+        created = create_bundle(
+            output,
+            scans,
+            include_diagnostics_json=cfg.report.include_diagnostics_json,
+        )
     except (FileSafetyError, OSError) as exc: console.print(f"[red]Unable to create bundle: {exc}[/red]"); raise typer.Exit(3) from None
     console.print(f"PASS Report bundle created: {created}\nReview report.md before sharing.")
