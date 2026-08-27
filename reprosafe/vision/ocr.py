@@ -3,8 +3,8 @@ from reprosafe.vision.base import OCRRegion
 class TesseractBackend:
     def available(self) -> bool:
         try:
-            import PIL  # noqa: F401
-            import pytesseract  # noqa: F401
+            import PIL  # type: ignore[import-not-found]  # noqa: F401
+            import pytesseract  # type: ignore[import-not-found]  # noqa: F401
             return True
         except ImportError:
             return False
